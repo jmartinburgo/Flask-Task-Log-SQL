@@ -1,4 +1,4 @@
-MYSQL_HOST="sql8.freemysqlhosting.net	"
+MYSQL_HOST="sql8.freemysqlhosting.net"
 MYSQL_USER="sql8639286"
 MYSQL_PASSWORD="3bgSHH2WwP"
 MYSQL_DB="sql8639286"
