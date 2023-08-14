@@ -38,7 +38,18 @@ def login():
     
 @app.route('/task', methods=['GET'])
 def tasks():
-    return render_template('tasks.html')
+    email=session['email']
+    cur=mysql.connection.cursor()
+    cur.execute("SELECT * FROM tasks WHERE email=%s",[email])
+    tasks=cur.fetchall()
+
+    insertObject = []
+    columanNames= [column[0] for column in cur.description]
+    for record in tasks:
+        insertObject.append(dict(zip(columanNames,record)))
+    cur.close()
+
+    return render_template('tasks.html', tasks=insertObject)
 
 @app.route('/logout')
 def logout():
@@ -57,9 +68,36 @@ def newTask():
         cur=mysql.connection.cursor()
         sql="INSERT INTO tasks (email, title, description, date_task) VALUES (%s,%s,%s,%s)"
         data=(email,title,description,dateTask)
-        cur.execute(sql.data)
+        cur.execute(sql,data)
         mysql.connection.commit()
     return redirect(url_for('tasks'))
+
+
+@app.route('/new-user', methods=['POST'])
+def newUser():
+    name= request.form['name']
+    surnames= request.form['surnames']
+    email= request.form['email']
+    password= request.form['password']
+
+    if name and surnames and email and password:
+        cur=mysql.connection.cursor()
+        sql="INSERT INTO users (name, surname, email, password) VALUES (%s,%s,%s,%s)"
+        data=(name, surnames,email,password)
+        cur.execute(sql,data)
+        mysql.connection.commit()
+    return redirect(url_for('tasks'))
+
+@app.route('/deleted-task', methods=['POST'])
+def deleteTask():
+    cur=mysql.connection.cursor()
+    id=request.form['id']
+    sql="DELETE FROM tasks WHERE id=%s"
+    data=(id,)
+    cur.execute(sql,data)
+    mysql.connection.commit()
+    return redirect(url_for('tasks'))
+
 
         
 
